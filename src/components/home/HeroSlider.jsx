@@ -79,7 +79,7 @@ const HeroSlider = () => {
       {/* Header Navigation */}
       <div className="sticky top-0 left-0 right-0 z-50 bg-transparent">
         <div className="container mx-auto px-4 lg:px-8">
-          <nav className="flex items-center justify-between h-[72px]">
+          <nav className="flex items-center justify-between h-[72px] w-full lg:w-auto">
             {/* Desktop Menu */}
             <ul className="hidden lg:flex items-center gap-12">
               <li><a href="#" className="text-sm text-white">About</a></li>
@@ -90,7 +90,7 @@ const HeroSlider = () => {
             </ul>
 
             {/* Right Side Navigation */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 w-full lg:w-auto">
               <button className="text-sm border border-white text-white px-4 py-2 inline-flex items-center gap-2 group">
                 Contact us
                 <svg 
@@ -107,7 +107,7 @@ const HeroSlider = () => {
 
               {/* Mobile Menu Button */}
               <button 
-                className="text-white lg:hidden"
+                className="text-white lg:hidden ml-auto"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
