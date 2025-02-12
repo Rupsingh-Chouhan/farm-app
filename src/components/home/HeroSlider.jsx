@@ -1,326 +1,239 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const slides = [
   {
     id: 1,
     image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1600&auto=format',
-    subtitle: 'Organic Farming',
-    title: ['Quality Products', 'From Nature'],
-    thumbnail: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&auto=format'
+    title: 'From Our Farms To Your Hands'
   },
   {
     id: 2,
     image: 'https://images.unsplash.com/photo-1472145246862-b24cf25c4a36?w=1600&auto=format',
-    subtitle: 'Organic Farming',
-    title: ['Quality Products', 'From Nature'],
-    thumbnail: 'https://images.unsplash.com/photo-1472145246862-b24cf25c4a36?w=400&auto=format'
+    title: 'From Our Farms To Your Hands'
   },
-  // Add more slides if needed
+  {
+    id: 3,
+    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&auto=format',
+    title: 'From Our Farms To Your Hands'
+  },
+  {
+    id: 4,
+    image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1600&auto=format',
+    title: 'From Our Farms To Your Hands'
+  }
 ]
 
 const slideVariants = {
   enter: {
-    opacity: 0,
+    clipPath: 'inset(50% 0% 50% 0%)',
+    zIndex: 3,
   },
   center: {
-    opacity: 1,
+    clipPath: 'inset(0% 0% 0% 0%)',
+    zIndex: 3,
     transition: {
-      duration: 0.8,
-      ease: [0.25, 0.1, 0.25, 1],
+      clipPath: {
+        duration: 1.5,
+        ease: 'easeInOut',
+      },
     },
   },
   exit: {
-    opacity: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.25, 0.1, 0.25, 1],
-    },
+    clipPath: 'inset(0% 0% 0% 0%)',
+    zIndex: 1,
   },
 }
 
 const HeroSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0)
-  const [progress, setProgress] = useState(0)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const progressInterval = useRef(null)
-  const SLIDE_DURATION = 5000
-
-  useEffect(() => {
-    startProgressTimer()
-    return () => clearInterval(progressInterval.current)
-  }, [currentSlide])
-
-  const startProgressTimer = () => {
-    setProgress(0)
-    clearInterval(progressInterval.current)
-    
-    const startTime = Date.now()
-    progressInterval.current = setInterval(() => {
-      const elapsedTime = Date.now() - startTime
-      const newProgress = (elapsedTime / SLIDE_DURATION) * 100
-      
-      if (newProgress >= 100) {
-        handleNextSlide()
-      } else {
-        setProgress(newProgress)
-      }
-    }, 16)
-  }
+  const [isAnimating, setIsAnimating] = useState(false)
 
   const handleNextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length)
-    setProgress(0)
-    startProgressTimer()
+    setIsAnimating(true)
   }
+
+  // Single timer for both slide and animation
+  useEffect(() => {
+    const timer = setInterval(() => {
+      handleNextSlide()
+    }, 6000)
+    return () => clearInterval(timer)
+  }, [])
 
   return (
     <div className="relative min-h-screen">
-      {/* Header Navigation */}
-      <div className="sticky top-0 left-0 right-0 z-50 bg-transparent">
-        <div className="container mx-auto px-4 lg:px-8">
-          <nav className="flex items-center justify-between h-[72px] w-full lg:w-auto">
-            {/* Desktop Menu */}
-            <ul className="hidden lg:flex items-center gap-12">
-              <li><a href="#" className="text-sm text-white">About</a></li>
-              <li><a href="#" className="text-sm text-white">News</a></li>
-              <li><a href="#" className="text-sm text-white">Services</a></li>
-              <li><a href="#" className="text-sm text-white">Our Team</a></li>
-              <li><a href="#" className="text-sm text-white">Make Enquiry</a></li>
-            </ul>
-
-            {/* Right Side Navigation */}
-            <div className="flex items-center gap-4 w-full lg:w-auto">
-              <button className="text-sm border border-white text-white px-4 py-2 inline-flex items-center gap-2 group">
-                Contact us
-                <svg 
-                  className="transform transition-transform group-hover:translate-x-1" 
-                  width="20" 
-                  height="20" 
-                  viewBox="0 0 20 20" 
-                  fill="none"
-                >
-                  <path d="M4.16666 10H15.8333" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                  <path d="M10.8333 5L15.8333 10L10.8333 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-              </button>
-
-              {/* Mobile Menu Button */}
-              <button 
-                className="text-white lg:hidden ml-auto"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M4 6H20M4 12H20M4 18H20" stroke="currentColor" strokeWidth="2"/>
-                </svg>
-              </button>
+      <div className="w-[1440px] mx-auto max-w-full">
+        <div className="mx-8">
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 overflow-hidden rounded z-1">
+              <img
+                src={slides[(currentSlide - 1 + slides.length) % slides.length].image}
+                alt="Previous slide"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/30" />
             </div>
-          </nav>
-        </div>
 
-        {/* Mobile Menu Overlay */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div 
-              className="fixed inset-0 bg-white z-40"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="container mx-auto px-4 py-8">
-                <div className="flex justify-end mb-8">
-                  <button
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M6 18L18 6M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                  </button>
+            <AnimatePresence initial={false}>
+              <motion.div 
+                key={currentSlide}
+                className="absolute inset-0"
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+              >
+                <div className="absolute inset-0 overflow-hidden rounded">
+                  <motion.img
+                    src={slides[currentSlide].image}
+                    alt={`Slide ${slides[currentSlide].id}`}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/30" />
+                  <div className="absolute inset-0 flex items-center p-16">
+                    <div>
+                      <p className="text-white text-sm mb-4">Welcome To TenTwenty Farms</p>
+                      <h1 className="text-white text-7xl font-light leading-tight">
+                        {slides[currentSlide].title}
+                      </h1>
+                    </div>
+                  </div>
                 </div>
-                <ul className="space-y-6">
-                  <li>
-                    <a 
-                      href="#" 
-                      className="text-2xl text-gray-900 font-light"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      About
-                    </a>
-                  </li>
-                  <li>
-                    <a 
-                      href="#" 
-                      className="text-2xl text-gray-900 font-light"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      News
-                    </a>
-                  </li>
-                  <li>
-                    <a 
-                      href="#" 
-                      className="text-2xl text-gray-900 font-light"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Services
-                    </a>
-                  </li>
-                  <li>
-                    <a 
-                      href="#" 
-                      className="text-2xl text-gray-900 font-light"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Our Team
-                    </a>
-                  </li>
-                  <li>
-                    <a 
-                      href="#" 
-                      className="text-2xl text-gray-900 font-light"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Make Enquiry
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
-      {/* Main Slider Section */}
-      <div className="absolute inset-0">
-        <AnimatePresence mode="wait">
-          {slides.map((slide, index) => (
-            currentSlide === index && (
-              <div key={slide.id} className="absolute inset-0">
-                <motion.img
-                  src={slide.image}
-                  alt={`Slide ${slide.id}`}
+          <div className="absolute left-16 bottom-16 flex items-center gap-8 z-50">
+            <div className="relative w-[100px] h-[100px] md:w-[138px] md:h-[138px] cursor-pointer" onClick={handleNextSlide}>
+              <div className="absolute inset-0">
+                <svg className="w-full h-full">
+                  <rect 
+                    className="w-full h-full fill-none stroke-white"
+                    strokeWidth="1"
+                  />
+                </svg>
+              </div>
+
+              <div className="absolute -inset-[7.5px]">
+                <svg className="w-full h-full">
+                  <rect 
+                    key={currentSlide}
+                    className="w-full h-full fill-none stroke-white animate-border"
+                    strokeWidth="15"
+                    strokeDasharray="550"
+                    strokeDashoffset="550"
+                    pathLength="550"
+                    style={{
+                      strokeLinecap: 'square',
+                      transformOrigin: '0 0',
+                    }}
+                    onAnimationEnd={() => setIsAnimating(false)}
+                  />
+                </svg>
+              </div>
+
+              <div className="absolute inset-[15px] md:inset-[22px]">
+                <img 
+                  src={slides[(currentSlide + 1) % slides.length].image}
+                  alt="Next slide"
                   className="w-full h-full object-cover"
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
                 />
-                <div className="absolute inset-0 bg-black/30" />
-                
-                <div className="absolute inset-0 flex flex-col justify-between">
-                  <div className="container mx-auto px-4 lg:px-8 pt-32">
-                    <motion.p 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.8 }}
-                      className="text-white text-xs md:text-sm mb-2 md:mb-4"
-                    >
-                      {slide.subtitle}
-                    </motion.p>
-                    <div className="space-y-1 md:space-y-2">
-                      {slide.title.map((line, i) => (
-                        <motion.h1 
-                          key={i} 
-                          initial={{ opacity: 0, y: 30 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -30 }}
-                          transition={{ 
-                            duration: 0.8, 
-                            delay: 0.3 + (i * 0.1),
-                            ease: [0.25, 0.1, 0.25, 1]
-                          }}
-                          className="text-white text-4xl md:text-6xl lg:text-8xl font-work-sans font-light leading-tight"
-                        >
-                          {line}
-                        </motion.h1>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Slider Navigation */}
-                  <div className="absolute left-4 md:left-8 bottom-8 flex items-center gap-16 md:gap-32">
-                    {/* Thumbnail with Progress */}
-                    <div 
-                      className="relative cursor-pointer group"
-                      onClick={handleNextSlide}
-                    >
-                      <div className="w-20 h-20 md:w-32 md:h-32 overflow-hidden">
-                        <img 
-                          src={slides[(currentSlide + 1) % slides.length].thumbnail}
-                          alt="Next slide"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
-                      </div>
-
-                      {/* White Border Frame */}
-                      <div className="absolute -top-2 -right-2 w-8 h-8 border-t-2 border-r-2 border-white" />
-                      <div className="absolute -bottom-2 -left-2 w-8 h-8 border-b-2 border-l-2 border-white" />
-
-                      {/* Progress Border - Clockwise Fill */}
-                      <div className="absolute inset-0">
-                        {/* Top Border - Left to Right */}
-                        <div 
-                          className="absolute top-0 left-0 h-[6px] bg-white"
-                          style={{
-                            width: progress <= 25 ? `${progress * 4}%` : '100%',
-                            transition: 'width 0.1s linear'
-                          }}
-                        />
-                        {/* Right Border - Top to Bottom */}
-                        <div 
-                          className="absolute top-0 right-0 w-[6px] bg-white"
-                          style={{
-                            height: progress > 25 && progress <= 50 ? `${(progress - 25) * 4}%` : progress > 50 ? '100%' : '0%',
-                            transition: 'height 0.1s linear'
-                          }}
-                        />
-                        {/* Bottom Border - Right to Left */}
-                        <div 
-                          className="absolute bottom-0 right-0 h-[6px] bg-white"
-                          style={{
-                            width: progress > 50 && progress <= 75 ? `${(progress - 50) * 4}%` : progress > 75 ? '100%' : '0%',
-                            transition: 'width 0.1s linear'
-                          }}
-                        />
-                        {/* Left Border - Bottom to Top */}
-                        <div 
-                          className="absolute left-0 bottom-0 w-[6px] bg-white"
-                          style={{
-                            height: progress > 75 ? `${(progress - 75) * 4}%` : '0%',
-                            transition: 'height 0.1s linear'
-                          }}
-                        />
-                      </div>
-
-                      {/* Static Border */}
-                      <div className="absolute inset-0 border-[6px] border-white/30" />
-
-                      <span className="absolute inset-0 flex items-center justify-center text-white text-base md:text-xl font-light">
-                        Next
-                      </span>
-                    </div>
-
-                    {/* Slide Numbers */}
-                    <div className="flex items-center">
-                      <span className="text-white text-xl md:text-[32px] font-light leading-none">
-                        {String(currentSlide + 1).padStart(2, '0')}
-                      </span>
-                      <div className="mx-1 md:mx-2 flex items-center">
-                        <div className="w-8 md:w-16 h-[1px] bg-white/50 rotate-[-15deg]" />
-                      </div>
-                      <span className="text-white/50 text-xl md:text-[32px] font-light leading-none">
-                        {String(slides.length).padStart(2, '0')}
-                      </span>
-                    </div>
-                  </div>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                  <span className="text-white text-base md:text-[20px] font-light">Next</span>
                 </div>
               </div>
-            )
-          ))}
-        </AnimatePresence>
+            </div>
+
+            <div className="flex items-center gap-2 md:gap-4">
+              <span className="text-white text-xs md:text-sm">0{currentSlide + 1}</span>
+              <div className="w-8 md:w-12 h-[1px] bg-white/50"></div>
+              <span className="text-white text-xs md:text-sm">04</span>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <style jsx>{`
+        @keyframes borderAnimation {
+          0% {
+            stroke-dashoffset: 550;
+          }
+          100% {
+            stroke-dashoffset: 0;
+          }
+        }
+
+        .animate-border {
+          animation: borderAnimation 6s linear forwards;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+          .w-\\[1440px\\] {
+            width: 100%;
+          }
+
+          .mx-8 {
+            margin-left: 1rem;
+            margin-right: 1rem;
+          }
+
+          .p-16 {
+            padding: 1.5rem;
+          }
+
+          .text-7xl {
+            font-size: 2.5rem;
+            line-height: 1.2;
+          }
+
+          .text-sm {
+            font-size: 0.75rem;
+          }
+
+          .mb-4 {
+            margin-bottom: 0.5rem;
+          }
+
+          .left-16 {
+            left: 1.5rem;
+          }
+
+          .bottom-16 {
+            bottom: 1.5rem;
+          }
+
+          .gap-8 {
+            gap: 1rem;
+          }
+
+          .w-\\[138px\\] {
+            width: 80px;
+          }
+
+          .h-\\[138px\\] {
+            height: 80px;
+          }
+
+          .inset-\\[22px\\] {
+            inset: 15px;
+          }
+
+          .-inset-\\[7\\.5px\\] {
+            inset: -5px;
+          }
+
+          .text-\\[20px\\] {
+            font-size: 1rem;
+          }
+
+          .w-12 {
+            width: 2rem;
+          }
+        }
+      `}</style>
     </div>
   )
 }
